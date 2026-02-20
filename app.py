@@ -1,8 +1,18 @@
+import requests
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+
+API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-small"
+
+HF_TOKEN = os.environ.get("HF_TOKEN")
+
+HEADERS = {
+    "Authorization": f"Bearer {HF_TOKEN}"
+}
 
 @app.route("/")
 def home():
@@ -11,15 +21,22 @@ def home():
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.json
-    message = data.get("message", "").lower()
+    user_message = data.get("message", "")
 
-    if "hi" in message:
-        reply = "Hello! I am Jarvis. How can I help you?"
-    elif "how are you" in message:
-        reply = "I am just code, but I am functioning perfectly!"
-    elif "your name" in message:
-        reply = "I am Jarvis, your AI assistant."
+    payload = {
+        "inputs": user_message
+    }
+
+    response = requests.post(API_URL, headers=HEADERS, json=payload)
+
+    if response.status_code == 200:
+        result = response.json()
+
+        if isinstance(result, list) and len(result) > 0:
+            reply = result[0].get("generated_text", "🤖")
+        else:
+            reply = "🤖"
     else:
-        reply = "Interesting... tell me more."
+        reply = "AI service error"
 
     return jsonify({"reply": reply})
