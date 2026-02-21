@@ -20,27 +20,29 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.json
-    user_message = data.get("message", "")
+    try:
+        data = request.json
+        user_message = data.get("message", "")
 
-    payload = {
-        "inputs": user_message
-    }
+        payload = {"inputs": user_message}
 
-    response = requests.post(API_URL, headers=HEADERS, json=payload)
+        response = requests.post(API_URL, headers=HEADERS, json=payload)
 
-    if response.status_code == 200:
+        print("HF STATUS:", response.status_code)
+        print("HF RESPONSE:", response.text)
+
         result = response.json()
 
-        if isinstance(result, list) and len(result) > 0:
-            reply = result[0].get("generated_text", "🤖")
-        else:
-            reply = "🤖"
-    else:
-        reply = "AI service error"
+        if response.status_code != 200:
+            return jsonify({"reply": "AI service error. Try again later."})
 
-    return jsonify({"reply": reply})
-if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+        if "error" in result:
+            return jsonify({"reply": "Model loading... please wait and try again."})
+
+        reply = result[0]["generated_text"]
+
+        return jsonify({"reply": reply})
+
+    except Exception as e:
+        print("SERVER ERROR:", str(e))
+        return jsonify({"reply": "Server error."})
