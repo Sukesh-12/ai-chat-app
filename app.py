@@ -1,4 +1,4 @@
-import requests
+ import requests
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -31,13 +31,18 @@ def chat():
         print("HF STATUS:", response.status_code)
         print("HF RESPONSE:", response.text)
 
-        result = response.json()
-
+        # 🔴 If request failed
         if response.status_code != 200:
-            return jsonify({"reply": "AI service error. Try again later."})
+            return jsonify({"reply": "AI service error. Check token or model."})
+
+        # 🔴 Try converting safely
+        try:
+            result = response.json()
+        except:
+            return jsonify({"reply": "Invalid response from AI service."})
 
         if "error" in result:
-            return jsonify({"reply": "Model loading... please wait and try again."})
+            return jsonify({"reply": "Model loading... please wait."})
 
         reply = result[0]["generated_text"]
 
