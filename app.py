@@ -8,10 +8,11 @@ CORS(app)
 
 HF_TOKEN = os.getenv("HF_TOKEN")
 
-API_URL = "https://router.huggingface.co/models/google/flan-t5-small"
+API_URL = "https://router.huggingface.co/hf-inference/models/google/flan-t5-small"
 
 HEADERS = {
-    "Authorization": f"Bearer {HF_TOKEN}"
+    "Authorization": f"Bearer {HF_TOKEN}",
+    "Content-Type": "application/json"
 }
 
 @app.route("/")
