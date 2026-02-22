@@ -1,14 +1,14 @@
- import requests
-import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import requests
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-API_URL = "https://router.huggingface.co/hf-inference/models/google/flan-t5-small"
+HF_TOKEN = os.getenv("HF_TOKEN")
 
-HF_TOKEN = os.environ.get("HF_TOKEN")
+API_URL = "https://router.huggingface.co/hf-inference/models/google/flan-t5-small"
 
 HEADERS = {
     "Authorization": f"Bearer {HF_TOKEN}"
@@ -31,11 +31,9 @@ def chat():
         print("HF STATUS:", response.status_code)
         print("HF RESPONSE:", response.text)
 
-        # 🔴 If request failed
         if response.status_code != 200:
             return jsonify({"reply": "AI service error. Check token or model."})
 
-        # 🔴 Try converting safely
         try:
             result = response.json()
         except:
@@ -50,4 +48,4 @@ def chat():
 
     except Exception as e:
         print("SERVER ERROR:", str(e))
-        return jsonify({"reply": "Server error."}) 
+        return jsonify({"reply": "Server error."})
