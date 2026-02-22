@@ -50,4 +50,4 @@ def chat():
 
     except Exception as e:
         print("SERVER ERROR:", str(e))
-        return jsonify({"reply": "Server error."})
+        return jsonify({"reply": "Server error."}) 
