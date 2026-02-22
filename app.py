@@ -1,21 +1,23 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import requests
+import google.generativeai as genai
 import os
 
 app = Flask(__name__)
 CORS(app)
 
-HF_TOKEN = os.getenv("HF_TOKEN")
+# Get Gemini API key from Render environment variables
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
-HEADERS = {
-    "Authorization": f"Bearer {HF_TOKEN}"
-}
+# Configure Gemini
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Load model
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 @app.route("/")
 def home():
-    return "Server is running!"
+    return "Jarvis AI Server is running!"
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -23,28 +25,14 @@ def chat():
         data = request.json
         user_message = data.get("message", "")
 
-        payload = {"inputs": user_message}
+        if not user_message:
+            return jsonify({"reply": "Please send a message."})
 
-        response = requests.post(API_URL, headers=HEADERS, json=payload)
+        # Generate AI response
+        response = model.generate_content(user_message)
 
-        print("HF STATUS:", response.status_code)
-        print("HF RESPONSE:", response.text)
-
-        if response.status_code != 200:
-            return jsonify({"reply": "AI service error. Check token or model."})
-
-        try:
-            result = response.json()
-        except:
-            return jsonify({"reply": "Invalid response from AI service."})
-
-        if "error" in result:
-            return jsonify({"reply": "Model loading... please wait."})
-
-        reply = result[0]["generated_text"]
-
-        return jsonify({"reply": reply})
+        return jsonify({"reply": response.text})
 
     except Exception as e:
         print("SERVER ERROR:", str(e))
-        return jsonify({"reply": "Server error."})
+        return jsonify({"reply": "AI service error."})
