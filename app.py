@@ -26,7 +26,7 @@ def chat():
             return jsonify({"reply": "Please send a message."})
 
         # Use supported model for current API
-        model = genai.GenerativeModel("models/gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-1.5-flash")
 
         response = model.generate_content(user_message)
 
