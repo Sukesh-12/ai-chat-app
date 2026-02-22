@@ -8,7 +8,7 @@ CORS(app)
 
 HF_TOKEN = os.getenv("HF_TOKEN")
 
-API_URL = "https://router.huggingface.co/hf-inference/models/google/flan-t5-small"
+API_URL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2"
 
 HEADERS = {
     "Authorization": f"Bearer {HF_TOKEN}",
