@@ -8,11 +8,9 @@ CORS(app)
 
 HF_TOKEN = os.getenv("HF_TOKEN")
 
-API_URL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2"
-
+API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
 HEADERS = {
-    "Authorization": f"Bearer {HF_TOKEN}",
-    "Content-Type": "application/json"
+    "Authorization": f"Bearer {HF_TOKEN}"
 }
 
 @app.route("/")
